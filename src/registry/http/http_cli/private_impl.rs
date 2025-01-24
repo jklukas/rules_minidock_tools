@@ -140,9 +140,10 @@ where
         req_builder
     };
     let request = complete_uri(context, req_builder).await?;
+    eprintln!("\n>>> REQUEST: {:?}", request);
 
     let res = inner_client.request(request).await;
-    eprintln!("res: {:?}", res);
+    eprintln!("\n>>> RESPONSE: {:?}", res);
     let r: Response<Body> = match res {
         Err(e) => {
             if e.is_connect() {

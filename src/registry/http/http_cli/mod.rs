@@ -32,13 +32,14 @@ impl HttpCli {
         method: http::Method,
         retries: usize,
     ) -> Result<Response<Body>, RequestFailType> {
-        self.request(
+        let res = self.request(
             uri,
             method,
             |method, c| async { c.method(method).body(Body::from("")).map_err(|e| e.into()) },
             retries,
         )
-        .await
+        .await;
+        res
     }
 
     pub async fn request<Fut, F, B>(
@@ -67,6 +68,7 @@ impl HttpCli {
             {
                 Ok(o) => return Ok(o),
                 Err(err) => {
+                    eprintln!("\n>>> ERR: {:?}", err);
                     if attempt > retries {
                         break err;
                     }
@@ -105,6 +107,7 @@ impl HttpCli {
                                 self.registry.clone(),
                             )
                             .await?;
+                            eprint!("Authenticated with {:?}", auth_info);
                             let mut ai = self.auth_info.lock().await;
                             *ai = Some(auth_info);
                             drop(ai);
