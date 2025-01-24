@@ -141,7 +141,9 @@ where
     };
     let request = complete_uri(context, req_builder).await?;
 
-    let r: Response<Body> = match inner_client.request(request).await {
+    let res = inner_client.request(request).await;
+    eprintln!("res: {:?}", res);
+    let r: Response<Body> = match res {
         Err(e) => {
             if e.is_connect() {
                 return Err(RequestFailType::ConnectError(e));
